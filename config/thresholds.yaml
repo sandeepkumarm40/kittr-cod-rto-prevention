@@ -1,0 +1,78 @@
+# ============================================================
+# COD RTO Risk Engine — Thresholds Configuration
+# ============================================================
+# Non-technical team: edit numbers here to tune the system.
+# No code changes needed. Restart the engine after editing.
+# ============================================================
+
+# --- Decision Buckets ---
+# Risk score is 0-100. Higher = riskier.
+decision_thresholds:
+  ship_as_is_below: 25        # score < 25 → Ship immediately
+  confirm_whatsapp_below: 35  # 25 ≤ score < 35 → Ask customer to confirm
+  nudge_prepaid_below: 50     # 35 ≤ score < 50 → Offer prepaid discount
+  hold_cancel_above: 50       # score ≥ 50 → Hold or cancel
+
+# --- Feature Weights (must sum to 100) ---
+feature_weights:
+  prior_rto_history: 25       # customer has past RTOs
+  address_quality: 20         # LLM address check (incomplete/fake)
+  pincode_rto_rate: 15        # historical RTO rate at that pincode
+  order_value_risk: 10        # high AOV on first order = riskier
+  name_quality: 10            # LLM name check (fake name like "Test Order")
+  phone_validity: 10          # invalid/placeholder phone
+  utm_source_risk: 5          # some channels have higher RTO
+  time_of_day_risk: 5         # late night orders slightly riskier
+
+# --- Pincode Risk Override ---
+# Pincodes with historical RTO rate above this % get an automatic +15 score boost
+high_rto_pincode_threshold_pct: 45
+
+# --- Order Value Thresholds ---
+suspicious_high_value: 2500   # order value (₹) above this on first order = +10 score
+zero_value_order: true        # order_value = 0 → automatic hold
+
+# --- Phone Validation ---
+valid_phone_digits: 10
+placeholder_phones:           # these phone numbers are flagged immediately
+  - "9999999999"
+  - "1234567890"
+  - "0000000000"
+
+# --- Name Blocklist ---
+# Exact matches (case-insensitive) are immediately flagged
+name_blocklist:
+  - "test order"
+  - "test"
+  - "asdf"
+  - "xyz"
+  - "dummy"
+
+# --- Address Quality ---
+# LLM scores address 0-10. Below this = poor quality
+poor_address_threshold: 4
+placeholder_addresses:        # immediate flags (no LLM needed)
+  - "xyz"
+  - "."
+  - "call me"
+  - "near station"
+  - "home"
+
+# --- WhatsApp Flow ---
+whatsapp:
+  confirmation_timeout_hours: 24
+  max_clarification_attempts: 1   # re-ask once if reply unclear
+  prepaid_discount_pct: 5         # % discount offered to switch to prepaid
+  prepaid_offer_valid_hours: 12
+  language: "hinglish"            # "hinglish" or "english"
+
+# --- Cost Model (for dashboard ₹ calculations) ---
+costs:
+  forward_shipping: 65            # ₹ per RTO
+  return_shipping: 65             # ₹ per RTO
+  packaging_handling: 25          # ₹ per RTO
+  damaged_product_cost: 180       # ₹ per damaged item
+  damaged_product_rate: 0.08      # 8% of returned products are damaged
+  avg_order_value: 649            # ₹ average order value
+  gross_margin: 0.62              # 62% gross margin on delivered order
+  customer_acquisition_cost: 300  # ₹ per new customer (Meta ads)

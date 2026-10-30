@@ -1,0 +1,28 @@
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables & secrets
+.env
+.env.local
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary analysis scratch files
+analysis/tune_grid.py
+analysis/tune_calibrated.py
+analysis/score_debug.py
